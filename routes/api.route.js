@@ -1,12 +1,12 @@
 const router = require("express").Router();
 const { PrismaClient } = require("@prisma/client");
-
+const nodemailer = require("nodemailer");
 const prisma = new PrismaClient();
 
 router.get("/referals", async (req, res, next) => {
   try {
     const referals = await prisma.referral.findMany({});
-    res.status(200).json({referals , message:'success'});
+    res.status(200).json({ referals, message: "success" });
   } catch (error) {
     console.log(error);
     res
@@ -15,8 +15,7 @@ router.get("/referals", async (req, res, next) => {
   }
 });
 router.post("/referals", async (req, res, next) => {
-
-  console.log(req.body)
+  console.log(req.body);
   const {
     referrerName,
     referrerEmail,
@@ -48,7 +47,26 @@ router.post("/referals", async (req, res, next) => {
       },
     });
 
-    res.status(201).json({referral , message:'success'});
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: "email@gmail.com", pass: "password" },
+    });
+
+    const mailOptions = {
+      from: "your-email@gmail.com",
+      to: refereeEmail,
+      subject: "You have been referred to a course!",
+      text: `Hi ${refereeName},\n\n${referrerName} has referred you to the course: ${courseName}.\n\nMessage: ${message}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return console.log(error);
+      }
+      console.log("Email sent: " + info.response);
+    });
+
+    res.status(201).json({ referral, message: "success" });
   } catch (error) {
     console.log(error);
     res

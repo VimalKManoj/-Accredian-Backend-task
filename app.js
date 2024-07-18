@@ -9,7 +9,10 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: [
+    "https://accredian-backend-task-9ts1.onrender.com",
+    "https://accredian-backend-task-9ts1.onrender.com/api/referals",
+  ],
   credentials: true,
 };
 
